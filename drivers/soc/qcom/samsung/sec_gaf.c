@@ -154,9 +154,9 @@ static struct GAForensicINFO {
 		offsetof(struct task_struct, normal_prio),
 	.task_struct_struct_rt_priority =
 		offsetof(struct task_struct, rt_priority),
-
+#ifndef CONFIG_SCHED_BFS
 	.task_struct_struct_se = offsetof(struct task_struct, se),
-
+#endif
 	.sched_entity_struct_exec_start =
 		offsetof(struct sched_entity, exec_start),
 	.sched_entity_struct_sum_exec_runtime =
@@ -246,11 +246,19 @@ void dump_one_task_info(struct task_struct *tsk, bool isMain)
 	GAFINFO.phys_offset = PHYS_OFFSET,
 	stat_ch = tsk->state <= TASK_UNINTERRUPTIBLE ?
 	stat_array[tsk->state] : '?';
+#ifdef CONFIG_SCHED_BFS
+	printk(KERN_INFO "%8d  %8d  %8d  %16lld  %c (%d)  %3d  %08x  %c %s\n",
+		tsk->pid, (int)(tsk->utime), (int)(tsk->stime),
+		tsk->last_ran, stat_ch, (int)(tsk->state),
+		*(int *)(ptr_thread_info + GAFINFO.thread_info_struct_cpu),
+		(int)tsk, isMain ? '*' : ' ', tsk->comm);
+#else
 	printk(KERN_INFO "%8d  %8d  %8d  %16lld  %c (%d)  %3d  %08x  %c %s\n",
 		tsk->pid, (int)(tsk->utime), (int)(tsk->stime),
 		tsk->se.exec_start, stat_ch, (int)(tsk->state),
 		*(int *)(ptr_thread_info + GAFINFO.thread_info_struct_cpu),
 		(int)tsk, isMain ? '*' : ' ', tsk->comm);
+#endif
 	if (tsk->state == TASK_RUNNING || tsk->state == TASK_UNINTERRUPTIBLE)
 		show_stack(tsk, NULL);
 }
