@@ -2123,7 +2123,7 @@ Index: linux-3.10-ck1/kernel/sched/bfs.c
 +	 */
 +	WARN_ON_ONCE(debug_locks && !lockdep_is_held(&grq.lock));
 +#endif
-+	trace_sched_migrate_task(p, cpu);
++	trace_sched_migrate_task(p, cpu, pct_task_load(p));
 +	if (task_cpu(p) != cpu)
 +		perf_sw_event(PERF_COUNT_SW_CPU_MIGRATIONS, 1, NULL, 0);
 +
