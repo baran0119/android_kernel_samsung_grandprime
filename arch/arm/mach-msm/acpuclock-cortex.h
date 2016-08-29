@@ -17,7 +17,7 @@
 #define LVL_NOM         RPM_REGULATOR_CORNER_NORMAL
 #define LVL_HIGH        RPM_REGULATOR_CORNER_SUPER_TURBO
 
-#define NUM_SPEED_BIN	8
+#define NUM_SPEED_BIN	10
 
 enum clk_src {
 	CXO,
