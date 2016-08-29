@@ -159,6 +159,11 @@ ifeq ($(CONFIG_SEC_E5_PROJECT),y)
 	endif
 endif
 
+ifeq ($(CONFIG_SEC_A3_EUR_PROJECT),y)
+	dtb-y += msm8916-sec-a3-eur-r00.dtb
+	dtb-y += msm8916-sec-a3-eur-r01.dtb
+endif
+
 ifeq ($(CONFIG_SEC_A3_PROJECT),y)
 	ifeq ($(CONFIG_MACH_A3U_EUR_OPEN),y)
 		dtb-y += msm8916-sec-a3u-eur-r01.dtb
@@ -169,6 +174,15 @@ ifeq ($(CONFIG_SEC_MATISSEVE_PROJECT),y)
 	ifeq ($(CONFIG_MACH_MATISSEVEWIFI_EUR_OPEN),y)
 		dtb-y += msm8916-sec-matissevewifi-eur-r00.dtb
 		dtb-y += msm8916-sec-matissevewifi-eur-r02.dtb
+	endif
+endif
+
+ifeq ($(CONFIG_SEC_A33G_EUR_PROJECT),y)
+	ifeq ($(CONFIG_MACH_A33G_EUR_OPEN),y)
+		dtb-y += msm8916-sec-a33g-eur-r00.dtb
+		dtb-y += msm8916-sec-a33g-eur-r01.dtb
+		dtb-y += msm8916-sec-a33g-eur-r03.dtb
+		dtb-y += msm8916-sec-a33g-eur-r04.dtb
 	endif
 endif
 
@@ -191,6 +205,10 @@ ifeq ($(CONFIG_SEC_FORTUNA_PROJECT),y)
 	ifeq ($(CONFIG_MACH_FORTUNA_TFN),y)
 		dtb-y += msm8916-sec-fortuna-tfn-r00.dtb
 		dtb-y += msm8916-sec-fortuna-tfn-r02.dtb
+	else ifeq ($(CONFIG_MACH_FORTUNA_EUR_OPEN),y)
+		dtb-y += msm8916-sec-fortuna-eur-r00.dtb
+		dtb-y += msm8916-sec-fortuna-eur-r01.dtb
+		dtb-y += msm8916-sec-fortuna-eur-r02.dtb
 	else ifeq ($(CONFIG_MACH_FORTUNA_USC),y)
 		dtb-y += msm8916-sec-fortuna-usc-r00.dtb
 		dtb-y += msm8916-sec-fortuna-usc-r01.dtb
@@ -200,20 +218,42 @@ ifeq ($(CONFIG_SEC_FORTUNA_PROJECT),y)
                 dtb-y += msm8916-sec-fortuna-tmo-r02.dtb
 	else ifeq ($(CONFIG_MACH_FORTUNA_SPR),y)
                 dtb-y += msm8916-sec-fortuna-spr-r00.dtb
+	else ifeq ($(CONFIG_MACH_FORTUNA3G_EUR),y)
+		dtb-y += msm8916-sec-fortuna-r00.dtb
+		dtb-y += msm8916-sec-fortuna-r01.dtb
+		dtb-y += msm8916-sec-fortuna-r03.dtb
+		dtb-y += msm8916-sec-fortuna-r04.dtb
+		dtb-y += msm8916-sec-fortuna-r06.dtb
+		dtb-y += msm8916-sec-fortuna-r07.dtb
+		dtb-y += msm8916-sec-fortuna-r09.dtb
+		dtb-y += msm8916-sec-fortuna-r11.dtb
+	else ifeq ($(CONFIG_MACH_FORTUNAVE3G_EUR),y)
+		dtb-y += msm8916-sec-fortuna-ve3g-r07.dtb
         endif
 
 endif
 
 ifeq ($(CONFIG_SEC_ROSSA_PROJECT),y)
-	ifeq ($(CONFIG_MACH_ROSSA_TMO),y)
-		dtb-y += msm8916-sec-rossatmo-r00.dtb
+	ifeq ($(CONFIG_MACH_ROSSA_EUR_OPEN),y)
+		dtb-y += msm8916-sec-rossa-eur-r00.dtb
+		dtb-y += msm8916-sec-rossa-eur-r01.dtb
+	else ifeq ($(CONFIG_MACH_ROSSA_TMO),y)
+		dtb-y += msm8916-sec-rossa-tmo-r00.dtb
 	endif
 endif
+
 
 ifeq ($(CONFIG_SEC_J1_PROJECT),y)
 	ifeq ($(CONFIG_MACH_J1_VZW),y)
 		dtb-y += msm8916-sec-j1vzw-r00.dtb
 		dtb-y += msm8916-sec-j1vzw-r02.dtb
+	endif
+endif
+
+ifeq ($(CONFIG_SEC_NOVEL_PROJECT),y)
+	ifeq ($(CONFIG_MACH_NOVEL_KOR_OPEN),y)
+		dtb-y += msm8916-sec-novel-kx-r00.dtb
+		dtb-y += msm8916-sec-novel-kx-r01.dtb
 	endif
 endif
 
