@@ -397,6 +397,41 @@ config SEC_A3_PROJECT
         help
           Support for Samsung A3 Project
 
+config MACH_A3_CHN_OPEN
+	depends on SEC_A3_PROJECT
+	default n
+	bool "Samsung A3 China Open"
+	help
+	  Support for Samsung A3 China Open device.
+
+config MACH_A3_CHN_TW
+	depends on SEC_A3_PROJECT
+	default n
+	bool "Samsung A3 China TW"
+	help
+	  Support for Samsung A3 China TW device.
+
+config MACH_A3_CHN_CTC
+	depends on SEC_A3_PROJECT
+	default n
+	bool "Samsung A3 China CTC"
+	help
+	  Support for Samsung A3 China CTC device.
+
+config MACH_FORTUNA3G_EUR
+	depends on SEC_FORTUNA_PROJECT
+	default n
+	bool "Samsung FORTUNA 3G Europe Open "
+	help
+	  Support for Samsung FORTUNA 3G Europe Open device.
+
+config MACH_FORTUNAVE3G_EUR
+	depends on SEC_FORTUNA_PROJECT
+		default n
+		bool "Samsung FORTUNAVE 3G Europe Open "
+		help
+		  Support for Samsung FORTUNAVE 3G Europe Open device.
+
 config MACH_A3U_EUR_OPEN
     depends on SEC_A3_PROJECT
         default n
@@ -707,6 +742,13 @@ config MACH_FORTUNA_TFN
         help
           Support for Samsung FORTUNA USA TFN device.
 
+config MACH_FORTUNA_EUR_OPEN
+	depends on SEC_FORTUNA_PROJECT
+	default n
+	bool "Samsung FORTUNA EUR OPEN"
+	help
+	  Support for Samsung FORTUNA EUR OPEN device.
+	  
 config MACH_FORTUNA_USC
     depends on SEC_FORTUNA_PROJECT
         default n
@@ -749,6 +791,13 @@ config MACH_ROSSA_SPR
 	help
 	  Support for Samsung ROSSA Sprint device.
 
+config MACH_ROSSA_EUR_OPEN
+	depends on SEC_ROSSA_PROJECT
+	default n
+	bool "Samsung ROSSA EUR OPEN"
+	help
+	  Support for Samsung ROSSA EUR OPEN device.
+
 config MACH_ROSSA_TMO
     depends on SEC_ROSSA_PROJECT
 	default n
@@ -756,12 +805,40 @@ config MACH_ROSSA_TMO
 	help
 	  Support for Samsung ROSSA TMobile device.
 
+config SEC_A3_EUR_PROJECT
+	depends on ARCH_MSM8916
+	default n
+	bool "Samsung A3 EUR Project"
+	help
+	  Support for Samsung A3 EUR Project
+
+config MACH_A3_EUR_OPEN
+	depends on SEC_A3_EUR_PROJECT
+	default n 
+	bool "Samsung A3 EUR OPEN"
+	help
+	  Support for Samsung A3 EUR OPEN device.
+
 config MACH_ROSSA_VZW
     depends on SEC_ROSSA_PROJECT
 	default n
 	bool "Samsung ROSSA Verizon"
 	help
 	  Support for Samsung ROSSA Verizon device.
+
+config SEC_A33G_EUR_PROJECT
+	depends on ARCH_MSM8916
+	default n
+	bool "Samsung A33G EUR Project"
+	help
+	  Support for Samsung A33G EUR Project
+
+config MACH_A33G_EUR_OPEN
+	depends on SEC_A33G_EUR_PROJECT
+	default n
+	bool "Samsung A33G EUR Open"
+	help
+	  Support for Samsung A33G EUR Open device.
 
 config SEC_SIGNUM_PROJECT
     depends on ARCH_MSM8916
