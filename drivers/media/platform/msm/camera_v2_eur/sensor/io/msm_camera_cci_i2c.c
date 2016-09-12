@@ -14,7 +14,6 @@
 #include "msm_camera_i2c.h"
 #include "msm_cci.h"
 
-//#define CONFIG_MSMB_CAMERA_DEBUG 1
 #undef CDBG
 #ifdef CONFIG_MSMB_CAMERA_DEBUG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
@@ -238,18 +237,14 @@ int32_t msm_camera_cci_i2c_write_table(
 	int32_t rc = -EFAULT;
 	struct msm_camera_cci_ctrl cci_ctrl;
 
-	if (!client || !write_setting) {
-		pr_err("[CCI]%s:%d failed\n", __func__, __LINE__);
+	if (!client || !write_setting)
 		return rc;
-	}
 
 	if ((write_setting->addr_type != MSM_CAMERA_I2C_BYTE_ADDR
 		&& write_setting->addr_type != MSM_CAMERA_I2C_WORD_ADDR)
 		|| (write_setting->data_type != MSM_CAMERA_I2C_BYTE_DATA
-		&& write_setting->data_type != MSM_CAMERA_I2C_WORD_DATA)) {
-		pr_err("[CCI]%s:%d failed\n", __func__, __LINE__);
+		&& write_setting->data_type != MSM_CAMERA_I2C_WORD_DATA))
 		return rc;
-	}
 
 	cci_ctrl.cmd = MSM_CCI_I2C_WRITE;
 	cci_ctrl.cci_info = client->cci_client;
@@ -279,7 +274,8 @@ int32_t msm_camera_cci_i2c_write_burst_table(
 		struct msm_camera_i2c_reg_setting *write_setting)
 {
 	int32_t rc = -EFAULT;
-	struct msm_camera_i2c_reg_array *reg_array = NULL;
+	//struct msm_camera_i2c_reg_array *reg_array = NULL;
+	struct msm_camera_i2c_burst_reg_array *reg_array = NULL;
 
 	if (!client || !write_setting) {
 		pr_err("[CCI]%s:%d failed\n", __func__, __LINE__);
@@ -296,8 +292,8 @@ int32_t msm_camera_cci_i2c_write_burst_table(
 	}
 
 	reg_array =
-		(struct msm_camera_i2c_reg_array *)write_setting->reg_setting;
-	CDBG("%s:%d size %d addr %x\n", __func__, __LINE__,
+		(struct msm_camera_i2c_burst_reg_array *)write_setting->reg_setting;
+	pr_err("%s:%d size %d addr %x\n", __func__, __LINE__,
 			reg_array->delay, reg_array->reg_addr);
 	rc = msm_camera_cci_i2c_write_burst(client, reg_array->reg_addr,
 			reg_array->reg_burst_data, reg_array->delay);
