@@ -1,3 +1,4 @@
+ifneq ($(CONFIG_MACH_FORTUNA_EUR_OPEN),y)
 ccflags-y += -Idrivers/media/platform/msm/camera_v2
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/codecs
@@ -17,3 +18,4 @@ obj-$(CONFIG_MSMB_CAMERA) += isp/
 obj-$(CONFIG_MSMB_CAMERA) += ispif/
 obj-$(CONFIG_MSMB_JPEG) += jpeg_10/
 obj-$(CONFIG_MSMB_CAMERA) += msm_buf_mgr/
+endif
