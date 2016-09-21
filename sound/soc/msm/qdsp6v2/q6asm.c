@@ -414,14 +414,6 @@ static void q6asm_session_free(struct audio_client *ac)
 	return;
 }
 
-static uint32_t q6asm_get_next_buf(uint32_t curr_buf, uint32_t max_buf_cnt)
-{
-	pr_debug("%s: curr_buf = %d, max_buf_cnt = %d\n",
-		 __func__, curr_buf, max_buf_cnt);
-	curr_buf += 1;
-	return (curr_buf >= max_buf_cnt) ? 0 : curr_buf;
-}
-
 static int q6asm_map_cal_memory(struct cal_block_data *cal_block)
 {
 	int			result = 0;
@@ -1784,8 +1776,7 @@ void *q6asm_is_cpu_buf_avail(int dir, struct audio_client *ac, uint32_t *size,
 		user accesses this function,increase cpu
 		buf(to avoid another api)*/
 		port->buf[idx].used = dir;
-		port->cpu_buf = q6asm_get_next_buf(port->cpu_buf,
-						   port->max_buf_cnt);
+		port->cpu_buf = ((port->cpu_buf + 1) & (port->max_buf_cnt - 1));
 		mutex_unlock(&port->lock);
 		return data;
 	}
@@ -1836,8 +1827,7 @@ void *q6asm_is_cpu_buf_avail_nolock(int dir, struct audio_client *ac,
 	 * buf(to avoid another api)
 	 */
 	port->buf[idx].used = dir;
-	port->cpu_buf = q6asm_get_next_buf(port->cpu_buf,
-					   port->max_buf_cnt);
+	port->cpu_buf = ((port->cpu_buf + 1) & (port->max_buf_cnt - 1));
 	return data;
 }
 
@@ -2261,15 +2251,6 @@ static int __q6asm_open_write(struct audio_client *ac, uint32_t format,
 	case FORMAT_FLAC:
 		open.dec_fmt_id = ASM_MEDIA_FMT_FLAC;
 		break;
-	case FORMAT_ALAC:
-		open.dec_fmt_id = ASM_MEDIA_FMT_ALAC;
-		break;
-	case FORMAT_VORBIS:
-		open.dec_fmt_id = ASM_MEDIA_FMT_VORBIS;
-		break;
-	case FORMAT_APE:
-		open.dec_fmt_id = ASM_MEDIA_FMT_APE;
-		break;
 	default:
 		pr_err("%s: Invalid format 0x%x\n", __func__, format);
 		goto fail_cmd;
@@ -2392,12 +2373,6 @@ static int __q6asm_open_read_write(struct audio_client *ac, uint32_t rd_format,
 	case FORMAT_MP3:
 		open.dec_fmt_id = ASM_MEDIA_FMT_MP3;
 		break;
-	case FORMAT_ALAC:
-		open.dec_fmt_id = ASM_MEDIA_FMT_ALAC;
-		break;
-	case FORMAT_APE:
-		open.dec_fmt_id = ASM_MEDIA_FMT_APE;
-		break;
 	default:
 		pr_err("%s: Invalid format 0x%x\n",
 				__func__, wr_format);
@@ -2423,12 +2398,6 @@ static int __q6asm_open_read_write(struct audio_client *ac, uint32_t rd_format,
 		break;
 	case FORMAT_AMRWB:
 		open.enc_cfg_id = ASM_MEDIA_FMT_AMRWB_FS;
-		break;
-	case FORMAT_ALAC:
-		open.enc_cfg_id = ASM_MEDIA_FMT_ALAC;
-		break;
-	case FORMAT_APE:
-		open.enc_cfg_id = ASM_MEDIA_FMT_APE;
 		break;
 	default:
 		pr_err("%s: Invalid format 0x%x\n",
@@ -3663,134 +3632,6 @@ fail_cmd:
 	return rc;
 }
 
-int q6asm_media_format_block_alac(struct audio_client *ac,
-				struct asm_alac_cfg *cfg, int stream_id)
-{
-	struct asm_alac_fmt_blk_v2 fmt;
-	int rc = 0;
-
-	pr_debug("%s :session[%d]rate[%d]ch[%d]\n", __func__,
-		ac->session, cfg->sample_rate, cfg->num_channels);
-
-	q6asm_stream_add_hdr(ac, &fmt.hdr, sizeof(fmt), TRUE, stream_id);
-	atomic_set(&ac->cmd_state, 1);
-
-	fmt.hdr.opcode = ASM_DATA_CMD_MEDIA_FMT_UPDATE_V2;
-	fmt.fmtblk.fmt_blk_size = sizeof(fmt) - sizeof(fmt.hdr) -
-						sizeof(fmt.fmtblk);
-
-	fmt.frame_length = cfg->frame_length;
-	fmt.compatible_version = cfg->compatible_version;
-	fmt.bit_depth = cfg->bit_depth;
-	fmt.pb = cfg->pb;
-	fmt.mb = cfg->mb;
-	fmt.kb = cfg->kb;
-	fmt.num_channels = cfg->num_channels;
-	fmt.max_run = cfg->max_run;
-	fmt.max_frame_bytes = cfg->max_frame_bytes;
-	fmt.avg_bit_rate = cfg->avg_bit_rate;
-	fmt.sample_rate = cfg->sample_rate;
-	fmt.channel_layout_tag = cfg->channel_layout_tag;
-
-	rc = apr_send_pkt(ac->apr, (uint32_t *) &fmt);
-	if (rc < 0) {
-		pr_err("%s :Comamnd media format update failed %d\n",
-				__func__, rc);
-		goto fail_cmd;
-	}
-	rc = wait_event_timeout(ac->cmd_wait,
-				(atomic_read(&ac->cmd_state) == 0), 5*HZ);
-	if (!rc) {
-		pr_err("%s :timeout. waited for FORMAT_UPDATE\n", __func__);
-		rc = -ETIMEDOUT;
-		goto fail_cmd;
-	}
-	return 0;
-fail_cmd:
-	return rc;
-}
-
-int q6asm_stream_media_format_block_vorbis(struct audio_client *ac,
-				struct asm_vorbis_cfg *cfg, int stream_id)
-{
-	struct asm_vorbis_fmt_blk_v2 fmt;
-	int rc = 0;
-
-	pr_debug("%s :session[%d] bit_stream_fmt[%d] stream_id[%d]\n",
-		__func__, ac->session, cfg->bit_stream_fmt, stream_id);
-
-	q6asm_stream_add_hdr(ac, &fmt.hdr, sizeof(fmt), TRUE, stream_id);
-	atomic_set(&ac->cmd_state, 1);
-
-	fmt.hdr.opcode = ASM_DATA_CMD_MEDIA_FMT_UPDATE_V2;
-	fmt.fmtblk.fmt_blk_size = sizeof(fmt) - sizeof(fmt.hdr) -
-						sizeof(fmt.fmtblk);
-
-	fmt.bit_stream_fmt = cfg->bit_stream_fmt;
-
-	rc = apr_send_pkt(ac->apr, (uint32_t *) &fmt);
-	if (rc < 0) {
-		pr_err("%s :Comamnd media format update failed %d\n",
-				__func__, rc);
-		goto fail_cmd;
-	}
-	rc = wait_event_timeout(ac->cmd_wait,
-				(atomic_read(&ac->cmd_state) == 0), 5*HZ);
-	if (!rc) {
-		pr_err("%s :timeout. waited for FORMAT_UPDATE\n", __func__);
-		rc = -ETIMEDOUT;
-		goto fail_cmd;
-	}
-	return 0;
-fail_cmd:
-	return rc;
-}
-
-int q6asm_media_format_block_ape(struct audio_client *ac,
-				struct asm_ape_cfg *cfg, int stream_id)
-{
-	struct asm_ape_fmt_blk_v2 fmt;
-	int rc = 0;
-
-	pr_debug("%s :session[%d]rate[%d]ch[%d]\n", __func__,
-			ac->session, cfg->sample_rate, cfg->num_channels);
-
-	q6asm_stream_add_hdr(ac, &fmt.hdr, sizeof(fmt), TRUE, stream_id);
-	atomic_set(&ac->cmd_state, 1);
-
-	fmt.hdr.opcode = ASM_DATA_CMD_MEDIA_FMT_UPDATE_V2;
-	fmt.fmtblk.fmt_blk_size = sizeof(fmt) - sizeof(fmt.hdr) -
-		sizeof(fmt.fmtblk);
-
-	fmt.compatible_version = cfg->compatible_version;
-	fmt.compression_level = cfg->compression_level;
-	fmt.format_flags = cfg->format_flags;
-	fmt.blocks_per_frame = cfg->blocks_per_frame;
-	fmt.final_frame_blocks = cfg->final_frame_blocks;
-	fmt.total_frames = cfg->total_frames;
-	fmt.bits_per_sample = cfg->bits_per_sample;
-	fmt.num_channels = cfg->num_channels;
-	fmt.sample_rate = cfg->sample_rate;
-	fmt.seek_table_present = cfg->seek_table_present;
-
-	rc = apr_send_pkt(ac->apr, (uint32_t *) &fmt);
-	if (rc < 0) {
-		pr_err("%s :Comamnd media format update failed %d\n",
-				__func__, rc);
-		goto fail_cmd;
-	}
-	rc = wait_event_timeout(ac->cmd_wait,
-			(atomic_read(&ac->cmd_state) == 0), 5*HZ);
-	if (!rc) {
-		pr_err("%s :timeout. waited for FORMAT_UPDATE\n", __func__);
-		rc = -ETIMEDOUT;
-		goto fail_cmd;
-	}
-	return 0;
-fail_cmd:
-	return rc;
-}
-
 static int __q6asm_ds1_set_endp_params(struct audio_client *ac, int param_id,
 				int param_value, int stream_id)
 {
@@ -4858,6 +4699,7 @@ int q6asm_set_dha(struct audio_client *ac,int *param)
 	cmd.enable = param[0];
 	for(i = 0; i < 12; i++)
 		cmd.gain[i/6][i%6] = param[i+1];
+	cmd.device = param[13];
 	rc = apr_send_pkt(ac->apr, (uint32_t *)&cmd);
 	if (rc < 0) {
 		rc = -EINVAL;
@@ -5172,8 +5014,7 @@ static int __q6asm_read(struct audio_client *ac, bool is_custom_len_reqd,
 		read.buf_size = is_custom_len_reqd ? len : ab->size;
 		read.seq_id = port->dsp_buf;
 		read.hdr.token = port->dsp_buf;
-		port->dsp_buf = q6asm_get_next_buf(port->dsp_buf,
-						   port->max_buf_cnt);
+		port->dsp_buf = (port->dsp_buf + 1) & (port->max_buf_cnt - 1);
 		mutex_unlock(&port->lock);
 		dev_vdbg(ac->dev, "%s: buf add[%pa] token[%d] uid[%d]\n",
 				__func__, &ab->phys, read.hdr.token,
@@ -5251,8 +5092,7 @@ int q6asm_read_nolock(struct audio_client *ac)
 			}
 		}
 
-		port->dsp_buf = q6asm_get_next_buf(port->dsp_buf,
-						   port->max_buf_cnt);
+		port->dsp_buf = (port->dsp_buf + 1) & (port->max_buf_cnt - 1);
 		dev_vdbg(ac->dev, "%s: buf add[%pa] token[%d] uid[%d]\n",
 				__func__, &ab->phys, read.hdr.token,
 				read.seq_id);
@@ -5457,8 +5297,7 @@ int q6asm_write(struct audio_client *ac, uint32_t len, uint32_t msw_ts,
 			write.flags = (0x00000000 | (flags & 0x800000FF));
 		else
 			write.flags = (0x80000000 | flags);
-		port->dsp_buf = q6asm_get_next_buf(port->dsp_buf,
-						   port->max_buf_cnt);
+		port->dsp_buf = (port->dsp_buf + 1) & (port->max_buf_cnt - 1);
 		buf_node = list_first_entry(&ac->port[IN].mem_map_handle,
 				struct asm_buffer_node,
 				list);
@@ -5535,8 +5374,7 @@ int q6asm_write_nolock(struct audio_client *ac, uint32_t len, uint32_t msw_ts,
 			write.flags = (0x00000000 | (flags & 0x800000FF));
 		else
 			write.flags = (0x80000000 | flags);
-		port->dsp_buf = q6asm_get_next_buf(port->dsp_buf,
-						   port->max_buf_cnt);
+		port->dsp_buf = (port->dsp_buf + 1) & (port->max_buf_cnt - 1);
 
 		dev_vdbg(ac->dev, "%s: ab->phys[%pa]bufadd[0x%x]token[0x%x] buf_id[0x%x]buf_size[0x%x]mmaphdl[0x%x]"
 				, __func__,
