@@ -176,6 +176,32 @@ config SEC_NFC_CLK_REQ
 
           Say Y here to compile support for exnternal clock control in the kernel.
 
+config SEC_NFC_USE_8916_RFCLK2
+	bool "Use PM8916 RF_CLK2 clock"
+	depends on SEC_NFC_CLK_REQ
+	default n
+	help
+	  Use PM8916 RF_CLK2 clock to NFC external clock (RF clock).
+	  This option should be enabled if you use PMIC(8916) RF_CLK2 for NFC
+	  external clock.
+
+config SEC_NFC_USE_8916_BBCLK2
+	bool "Use PM8916 BB_CLK2 clock"
+	depends on SEC_NFC
+	default n
+	help
+	  Use PM8916 RF_CLK2 clock to NFC external clock (RF clock).
+	  This option should be enabled if you use PMIC(8916) RF_CLK2 for NFC
+	  external clock.
+
+config SEC_NFC_CLK_ALWAYS_ENABLE
+	bool "Make NFC clock always enabled when NFC is on"
+	depends on SEC_NFC
+	default n
+	help
+	  Make NFC clock always enabled when NFC is on because of
+	  GPS performance issue.
+
 config SEC_NFC_IO_EN
         bool "SEC NFC IO EN"
 	    depends on I2C
