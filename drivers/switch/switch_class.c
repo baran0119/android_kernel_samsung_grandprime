@@ -40,7 +40,7 @@ static ssize_t state_show(struct device *dev, struct device_attribute *attr,
 	return sprintf(buf, "%d\n", sdev->state);
 }
 
-#if !defined(CONFIG_SEC_FORTUNA_PROJECT)
+#if !defined(CONFIG_MACH_FORTUNA_EUR_OPEN)
 static ssize_t state_store(struct device *dev, struct device_attribute *attr,
 			   const char *buf, size_t count)
 {
@@ -72,7 +72,7 @@ static ssize_t name_show(struct device *dev, struct device_attribute *attr,
 	return sprintf(buf, "%s\n", sdev->name);
 }
 
-#if defined(CONFIG_SEC_FORTUNA_PROJECT)
+#if defined(CONFIG_MACH_FORTUNA_EUR_OPEN)
 static DEVICE_ATTR(state, S_IRUGO, state_show, NULL);
 static DEVICE_ATTR(name, S_IRUGO, name_show, NULL);
 #else

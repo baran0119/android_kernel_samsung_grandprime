@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  */
-#if defined(CONFIG_SEC_FORTUNA_PROJECT)
+#if defined(CONFIG_MACH_FORTUNA_EUR_OPEN)
 #define MOBICORE_COMPONENT_BUILD_TAG \
 	"t-base-QC-MSM8916-Android-301B-V001-2015-01-07_20-03-32_27"
 #else

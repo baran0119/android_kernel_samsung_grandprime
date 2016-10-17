@@ -520,7 +520,7 @@ static phys_addr_t get_mci_base_phys(unsigned int len)
 		ctx.mci_base.order = order;
 		ctx.mci_base.addr =
 			(void *)__get_free_pages(GFP_USER | __GFP_ZERO, order);
-#if defined(CONFIG_SEC_FORTUNA_PROJECT)
+#if defined(CONFIG_MACH_FORTUNA_EUR_OPEN)
 		ctx.mci_base.len = (1 << order) * PAGE_SIZE;
 #endif
 		if (ctx.mci_base.addr == NULL) {
@@ -742,7 +742,7 @@ found:
 		if (!ctx.mci_base.addr)
 			return -EFAULT;
 
-#if defined(CONFIG_SEC_FORTUNA_PROJECT)
+#if defined(CONFIG_MACH_FORTUNA_EUR_OPEN)
 		if (len != ctx.mci_base.len)
 			return -EINVAL;
 #endif
